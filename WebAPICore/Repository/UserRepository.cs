@@ -9,7 +9,7 @@ using WebAPICore.Model.Response;
 
 namespace WebAPICore.Repository
 {
-    public class NhanVienRepository
+    public class UserRepository
     {
         public static bool HT_CHECK_REFRESH_TOKEN(string refresh_token)
         {
@@ -29,11 +29,9 @@ namespace WebAPICore.Repository
             {
                 var param = new SQLDynamicParameters();
                 param.Add("P_USERNAME", username);
-                var response = baseSQL.GetSingle("NV_GET_THONG_TIN_LOGIN", param);
+                var response = baseSQL.GetSingle("THONG_TIN_LOGIN", param);
                 return response;
             }
         }
-        
-
     }
 }
