@@ -24,6 +24,7 @@ namespace WebAPICore
         public static string PathLog { get; set; }
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
+        public static string ConnectApiLoadData { get; private set; }
 
         readonly string MyAllowSpecificOrigins = "AllowOrigin";
         public Startup(IWebHostEnvironment env, IConfiguration configuration)
@@ -33,6 +34,7 @@ namespace WebAPICore
             ConnectString = _configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
             ConnectStringWifi = _configuration.GetValue<string>("ConnectionStrings:WifiConnection");
             PathLog = _configuration.GetValue<string>("path_log");
+            ConnectApiLoadData = _configuration.GetValue<string>("ApiStrings:Api_load_data");
         }
 
         public IConfiguration Configuration { get; }
