@@ -41,7 +41,10 @@ namespace WebAPICore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-
+            services.AddControllers(otpion =>
+            {
+                otpion.Filters.Add(new FilterApiRequest());
+            });
             services.AddCors();
             services.AddControllers();
             services.AddMvc().AddNewtonsoftJson();
