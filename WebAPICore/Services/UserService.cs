@@ -17,11 +17,11 @@ namespace WebAPICore.Services
         User GetById(int id);
         ResponseSingle Login(string username, string password);
         IEnumerable<User> GetAll();
-        JToken CapNhatThongTin(NV_CUD_NHAN_VIEN_IN obj);
-        JToken UpdateThongTinNhanVien(NV_CUD_NHAN_VIEN_IN obj);
+        JToken CreateUser(UserModel obj);
+        JToken UpdateUser(UserModel obj);
         JToken ResetPass(String username, string password, String key);
         JToken DanhSachNhanVien();
-        JToken ThongTinNhanVien(int ma_nhan_vien_kc);
+        JToken ThongTinNhanVien(int id);
     }
     public class UserService : IUserService
     {
@@ -42,7 +42,7 @@ namespace WebAPICore.Services
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is required");
 
-            ResponseSingle response = NhanVienRepository.CB_CHECK_LOGIN(user.ten_dang_nhap);
+            ResponseSingle response = UserRepository.CB_CHECK_LOGIN(user.ten_dang_nhap);
 
             if (response.data != null)
                 throw new AppException("Cán bộ \"" + user.ten_dang_nhap + "\" đã tồn tại");
@@ -52,10 +52,6 @@ namespace WebAPICore.Services
 
             user.password_hash = passwordHash;
             user.password_salt = passwordSalt;
-
-            //NhanVienRepository.NV_CUD_NHAN_VIEN(user);
-            //_context.Users.Add(user);
-
             return user;
         }
 
@@ -82,7 +78,7 @@ namespace WebAPICore.Services
             {
                 var param = new SQLDynamicParameters();
                 param.Add("P_USERNAME", username);
-                response = baseSQL.GetSingle("NV_GET_THONG_TIN_LOGIN", param);
+                response = baseSQL.GetSingle("THONG_TIN_LOGIN", param);
                 if (!response.success || response.data == null)
                 {
                     response.SetError("User không tồn tại");
@@ -90,7 +86,7 @@ namespace WebAPICore.Services
                 }
                 var user = response.data;
                 // check if password is correct
-                if (!VerifyPasswordHash(password, user.PASSWORD_HASH, user.PASSWORD_SALT))
+                if (!VerifyPasswordHash(password, user.password_hash, user.password_salt))
                 {
                     response.SetError("Password không đúng");
                     return response;
@@ -100,7 +96,7 @@ namespace WebAPICore.Services
             }
         }
 
-        public JToken CapNhatThongTin(NV_CUD_NHAN_VIEN_IN obj)
+        public JToken CreateUser(UserModel obj)
         {
             ResponseExecute response = new ResponseExecute();
 
@@ -111,8 +107,8 @@ namespace WebAPICore.Services
             }
 
             //check username exist
-            var checkLogin = NhanVienRepository.CB_CHECK_LOGIN(obj.username);
-            if(!checkLogin.success || checkLogin.data != null)
+            var checkLogin = UserRepository.CB_CHECK_LOGIN(obj.username);
+            if (!checkLogin.success || checkLogin.data != null)
             {
                 response.SetError("Nhân viên \"" + obj.username + "\" đã tồn tại");
                 return JsonHelper.ToJson(response);
@@ -126,27 +122,18 @@ namespace WebAPICore.Services
             {
                 var param = new SQLDynamicParameters();
                 param.Add("P_USERNAME", obj.username);
-                param.Add("P_HO_VA_TEN_NHAN_VIEN", obj.ho_va_ten_nhan_vien);
+                param.Add("P_HO_TEN", obj.ho_ten);
                 param.Add("P_PASSWORD_HASH", passwordHash);
                 param.Add("P_PASSWORD_SALT", passwordSalt);
                 param.Add("P_DON_VI", obj.don_vi);
-                param.Add("P_MA_CHOT", obj.ma_chot);
-                param.Add("P_MA_HUYEN", obj.ma_huyen);
-                param.Add("P_IS_KCN", obj.is_kcn);
-                param.Add("P_IS_CONG_TY", obj.is_cong_ty);
-                param.Add("P_IS_LANH_DAO", obj.is_lanh_dao);
-                param.Add("P_IS_CHOT", obj.is_chot);
-                param.Add("P_MA_CONG_TY", obj.ma_cong_ty);
-                param.Add("P_MA_KCN", obj.ma_kcn);
                 param.Add("P_PASS_SHOW", obj.password);
-
-
-                response = baseSQL.Execute("NV_THEM_NHAN_VIEN", param);
+                param.Add("P_ROLE_ID", obj.role_id);
+                response = baseSQL.Execute("CREATE_USER", param);
                 return JsonHelper.ToJson(response);
             }
         }
 
-        public JToken UpdateThongTinNhanVien(NV_CUD_NHAN_VIEN_IN obj)
+        public JToken UpdateUser(UserModel obj)
         {
             ResponseExecute response = new ResponseExecute();
 
@@ -157,40 +144,26 @@ namespace WebAPICore.Services
             }
 
             //check username exist
-            var checkLogin = NhanVienRepository.CB_CHECK_LOGIN(obj.username);
+            // var checkLogin = UserRepository.CB_CHECK_LOGIN(obj.username);
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(obj.password, out passwordHash, out passwordSalt);
             //if (!checkLogin.success || checkLogin.data != null)
             //{
-                using (var baseSQL = new BaseSQL())
-                {
-                    var param = new SQLDynamicParameters();
-                    param.Add("P_MA_NHAN_VIEN_KC", obj.ma_nhan_vien_kc);
-                    param.Add("P_USERNAME", obj.username);
-                    param.Add("P_HO_VA_TEN_NHAN_VIEN", obj.ho_va_ten_nhan_vien);
-                    param.Add("P_PASSWORD_HASH", passwordHash);
-                    param.Add("P_PASSWORD_SALT", passwordSalt);
-                    param.Add("P_DON_VI", obj.don_vi);
-                    param.Add("P_MA_CHOT", obj.ma_chot);
-                    param.Add("P_MA_HUYEN", obj.ma_huyen);
-                    param.Add("P_IS_KCN", obj.is_kcn);
-                    param.Add("P_IS_CONG_TY", obj.is_cong_ty);
-                    param.Add("P_IS_LANH_DAO", obj.is_lanh_dao);
-                    param.Add("P_IS_CHOT", obj.is_chot);
-                    param.Add("P_MA_CONG_TY", obj.ma_cong_ty);
-                    param.Add("P_MA_KCN", obj.ma_kcn);
-                    param.Add("P_PASS_SHOW", obj.password);
-
-                    response = baseSQL.Execute("NV_CAP_NHAT_NHAN_VIEN", param);
-                    return JsonHelper.ToJson(response);
-                }
-            //}
-            //else
-            //{
-            //    response.SetError("Nhân viên \"" + obj.username + "\" đã chưa tồn tại");
-            //    return JsonHelper.ToJson(response);
-            //}
+            using (var baseSQL = new BaseSQL())
+            {
+                var param = new SQLDynamicParameters();
+                param.Add("P_ID", obj.id);
+                param.Add("P_USERNAME", obj.username);
+                param.Add("P_HO_TEN", obj.ho_ten);
+                param.Add("P_PASSWORD_HASH", passwordHash);
+                param.Add("P_PASSWORD_SALT", passwordSalt);
+                param.Add("P_DON_VI", obj.don_vi);
+                param.Add("P_PASS_SHOW", obj.password);
+                param.Add("P_ROLE_ID", obj.role_id);
+                response = baseSQL.Execute("UPDATE_USER", param);
+                return JsonHelper.ToJson(response);
+            }
         }
 
         public JToken ResetPass(String username, String password, String key)
@@ -203,14 +176,14 @@ namespace WebAPICore.Services
                 return JsonHelper.ToJson(response);
             }
 
-            if(key != "Admin12345!@#")
+            if (key != "Admin12345!@#")
             {
                 response.SetError("Key sai");
                 return JsonHelper.ToJson(response);
             }
 
             //check username exist
-            var checkLogin = NhanVienRepository.CB_CHECK_LOGIN(username);
+            var checkLogin = UserRepository.CB_CHECK_LOGIN(username);
             if (!checkLogin.success && checkLogin.data == null)
             {
                 response.SetError("Nhân viên \"" + username + "\" không tồn tại");
@@ -225,10 +198,11 @@ namespace WebAPICore.Services
             {
                 var param = new SQLDynamicParameters();
                 param.Add("P_USERNAME", username);
+                param.Add("P_PASSWORD_SHOW", password);
                 param.Add("P_PASSWORD_HASH", passwordHash);
                 param.Add("P_PASSWORD_SALT", passwordSalt);
 
-                response = baseSQL.Execute("NV_RESET_PASS", param);
+                response = baseSQL.Execute("RESET_PASS", param);
                 return JsonHelper.ToJson(response);
             }
         }
@@ -238,18 +212,18 @@ namespace WebAPICore.Services
             using (var baseSQl = new BaseSQL())
             {
                 var param = new SQLDynamicParameters();
-                var response = baseSQl.GetList("NV_GET_DANH_SACH_NHAN_VIEN", param);
+                var response = baseSQl.GetList("DANH_SACH_USER", param);
                 return JsonHelper.ToJson(response);
             }
         }
 
-        public JToken ThongTinNhanVien(int ma_nhan_vien_kc)
+        public JToken ThongTinNhanVien(int id)
         {
             using (var baseSQL = new BaseSQL())
             {
                 var param = new SQLDynamicParameters();
-                param.Add("P_MA_NHAN_VIEN_KC", ma_nhan_vien_kc);
-                var response = baseSQL.GetSingle("NV_GET_THONG_TIN_NHAN_VIEN", param);
+                param.Add("P_ID", id);
+                var response = baseSQL.GetSingle("INFORMATION_USER", param);
                 return JsonHelper.ToJson(response);
             }
         }

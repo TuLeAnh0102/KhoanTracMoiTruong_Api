@@ -39,7 +39,7 @@ namespace WebAPICore.Controllers
             _appSettings = appSettings.Value;
         }
 
-        [HttpGet("api/users/getall")]
+        [HttpGet("api/user/getall")]
         public IActionResult GetAll()
         {
             var users = _userService.GetAll();
@@ -47,7 +47,7 @@ namespace WebAPICore.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("api/nhan-vien/login")]
+        [HttpPost("api/user/login")]
         public JToken Login(string username, string password)
         {
             var response = new ResponseSingle();
@@ -62,7 +62,7 @@ namespace WebAPICore.Controllers
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                    new Claim(ClaimTypes.Name, userResponse.data.MA_NHAN_VIEN_KC.ToString())
+                    new Claim(ClaimTypes.Name, userResponse.data.id.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -73,19 +73,8 @@ namespace WebAPICore.Controllers
                 var data = new
                 {
                     token = tokenString,
-                    ten_chot = userResponse.data.DON_VI,
-                    ma_chot = userResponse.data.MA_CHOT,
-                    ma_nhan_vien_kc = userResponse.data.MA_NHAN_VIEN_KC,
-                    is_chot = userResponse.data.IS_CHOT,
-                    is_lanh_dao = userResponse.data.IS_LANH_DAO,
-                    is_kcn = userResponse.data.IS_KCN,
-                    is_chot_kb_gtvt = userResponse.data.IS_CHOT_KB_GTVT,
-                    is_admin_gtvt = userResponse.data.IS_ADMIN_GTVT,            
-                    is_cong_ty = userResponse.data.IS_CONG_TY,
-                    ma_cong_ty= userResponse.data.MA_CONG_TY,
-                    ma_kcn = userResponse.data.MA_KCN,
-					is_so_ldtbxh = userResponse.data.IS_SO_LDTBXH,
-					is_admin =  userResponse.data.IS_ADMIN                
+                    id = userResponse.data.ID,
+                    is_admin = userResponse.data.IS_ADMIN
                 };
 
                 response.success = true;
@@ -94,24 +83,22 @@ namespace WebAPICore.Controllers
             return JsonHelper.ToJson(response);
         }
 
-        [AllowAnonymous]
-        [HttpPost("api/nhan-vien/cap-nhat-thong-tin")]
-        public JToken CapNhatThongTinNhanVien(NV_CUD_NHAN_VIEN_IN obj)
+        [HttpPost("api/user/create")]
+        public JToken CreateUser(UserModel user)
         {
-            return _userService.CapNhatThongTin(obj);
+            return _userService.CreateUser(user);
         }
 
+        
+
         [AllowAnonymous]
-        [HttpPost("api/nhan-vien/tao-nhan-vien")]
-        public JToken ThemNhanVien(string username, string password, string hoten, string donvi)
+        [HttpPost("api/user/update")]
+        public JToken CapNhatThongTinNhanVien(UserModel user)
         {
-            NV_CUD_NHAN_VIEN_IN user = new NV_CUD_NHAN_VIEN_IN();
-            user.ho_va_ten_nhan_vien = hoten;
-            user.don_vi = donvi;
-            user.username = username;
-            user.password = password;
-            return _userService.CapNhatThongTin(user);
+            return _userService.UpdateUser(user);
         }
+
+        
 
         [AllowAnonymous]
         [HttpPost("api/nhan-vien/reset-pass")]
@@ -126,10 +113,10 @@ namespace WebAPICore.Controllers
             return _userService.DanhSachNhanVien();
         }
 
-        [HttpGet("api/nhan-vien/thong-tin-nhan-vien")]
-        public JToken ThongTinNhanVien(int ma_nhan_vien_kc)
+        [HttpGet("api/user/informationUser")]
+        public JToken ThongTinNhanVien(int id)
         {
-            return _userService.ThongTinNhanVien(ma_nhan_vien_kc);
+            return _userService.ThongTinNhanVien(id);
         }
     }
 }
