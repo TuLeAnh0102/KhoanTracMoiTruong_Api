@@ -25,8 +25,6 @@ namespace WebAPICore.Controllers
     [ApiController]
     public class ChiSoKhongKhiController : ControllerBase
     {
-        private HttpClient client = new HttpClient();
-
        
         [AllowAnonymous]
         [HttpGet("api/chi-so-khong-khi/thong-so-aqi-khong-khi")]
@@ -49,7 +47,7 @@ namespace WebAPICore.Controllers
                     }
                 }
                 //read file local and insert in database from time max
-                Create_Chi_So_Quan_Trac(ma_loai_quan_trac, ma_tram_quan_trac, time_max);
+                //Create_Chi_So_Quan_Trac(ma_loai_quan_trac, ma_tram_quan_trac, time_max);
 
 
                 thongSoAqi.VN_AQI_H = 70;
