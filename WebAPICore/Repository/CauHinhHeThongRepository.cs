@@ -11,6 +11,17 @@ namespace WebAPICore.Repository
 {
     public class CauHinhHeThongRepository
     {
+        public static JToken getMenuByUser(int user_id, int role_id)
+        {
+            using (var baseSQL = new BaseSQL())
+            {
+                var param = new SQLDynamicParameters();
+                param.Add("p_user_id", user_id);
+                param.Add("p_role_id", role_id);
+                var response = baseSQL.GetList("CAUHINH_Get_Menu_By_User", param);
+                return JsonHelper.ToJson(response);
+            }
+        }
         public static JToken getLoaiTaiKhoan()
         {
             using (var baseSQL = new BaseSQL())

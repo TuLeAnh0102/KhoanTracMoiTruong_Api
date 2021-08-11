@@ -10,7 +10,12 @@ namespace WebAPICore.Controllers
     [ApiController]
     public class CauHinhHeThongController : ControllerBase
     {
-        // to khai van tai
+
+        [HttpGet("api/cau-hinh/get-menu-by-user")]
+        public JToken getMenu(int user_id, int role_id)
+        {
+            return CauHinhHeThongRepository.getMenuByUser(user_id,role_id);
+        }
         [HttpGet("api/cau-hinh/get-loai-tai-khoan")]
         public JToken GetLoaiTaiKhoan()
         {

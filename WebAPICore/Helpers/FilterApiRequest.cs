@@ -23,7 +23,7 @@ namespace WebAPICore.Helpers
             var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
             var userId = context.HttpContext.User.Identity.Name;//lấy userID
             //var user = userService.GetById(userId);//compare với DB, thay bằng hàm khác truyền userID và pathUreApi để comnpare
-            if (userId == "1")//check giá trị trả về từ user
+            if (userId == "2")//check giá trị trả về từ user
             {
                 dynamic obj = new ExpandoObject();
                 obj.success = false;
