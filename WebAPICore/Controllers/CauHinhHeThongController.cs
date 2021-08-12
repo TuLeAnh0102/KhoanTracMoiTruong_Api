@@ -16,6 +16,14 @@ namespace WebAPICore.Controllers
         {
             return CauHinhHeThongRepository.getMenuByUser(user_id,role_id);
         }
+        [HttpGet("api/cau-hinh/get-menu")]
+        public JToken getMenuAll(int user_id, int role_id)
+        {
+            return CauHinhHeThongRepository.getMenuAdmin(user_id, role_id);
+        }
+
+
+
         [HttpGet("api/cau-hinh/get-loai-tai-khoan")]
         public JToken GetLoaiTaiKhoan()
         {

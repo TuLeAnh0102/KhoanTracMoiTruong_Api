@@ -22,6 +22,17 @@ namespace WebAPICore.Repository
                 return JsonHelper.ToJson(response);
             }
         }
+        public static JToken getMenuAdmin(int user_id, int role_id)
+        {
+            using (var baseSQL = new BaseSQL())
+            {
+                var param = new SQLDynamicParameters();
+                param.Add("p_user_id", user_id);
+                param.Add("p_role_id", role_id);
+                var response = baseSQL.GetList("CAUHINH_Get_Danh_Sach_Menu", param);
+                return JsonHelper.ToJson(response);
+            }
+        }
         public static JToken getLoaiTaiKhoan()
         {
             using (var baseSQL = new BaseSQL())
