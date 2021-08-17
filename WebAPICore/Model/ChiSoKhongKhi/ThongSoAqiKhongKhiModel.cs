@@ -48,5 +48,13 @@ namespace WebAPICore.Model.ChiSoKhongKhi
         public string anh_huong_suc_khoe { get; set; }
         public string kn_nguoi_binh_thuong { get; set; }
         public string kn_nguoi_nhay_cam { get; set; }
+        public string mau_border_box1 { get; set; }
+        public string mau_chu_title_box1{ get; set; }
+        public string mau_nen_content_box1 { get; set; }
+        public string mau_nen_title_box1{ get; set; }
+        public string mau_nen_box2 { get; set; }
+        public string mau_noi_dung_bang_Aqi { get; set; }
+        public string mau_footer { get; set; }
+        public string emotion { get; set; }
     }
 }
