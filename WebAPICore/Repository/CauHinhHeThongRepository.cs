@@ -33,6 +33,25 @@ namespace WebAPICore.Repository
                 return JsonHelper.ToJson(response);
             }
         }
+        public static JToken updateDanhSachMenuHeThong(CauHinhModal obj)
+        {
+            using (var baseSQL = new BaseSQL())
+            {
+                var param = new SQLDynamicParameters();
+                param.Add("p_id_menu", obj.id_menu);
+                param.Add("p_ten_menu", obj.ten_menu);
+                param.Add("p_tag", obj.tag);
+                param.Add("p_icon", obj.icon);
+                param.Add("p_duong_dan", obj.duong_dan);
+                param.Add("p_stt", obj.stt);
+                param.Add("p_id_cha", obj.id_cha);
+                param.Add("p_is_delete", obj.is_delete);
+                var response = baseSQL.GetList("CAUHINH_Update_Danh_Sach_Menu", param);
+                return JsonHelper.ToJson(response);
+            }
+        }
+
+
         public static JToken getLoaiTaiKhoan()
         {
             using (var baseSQL = new BaseSQL())

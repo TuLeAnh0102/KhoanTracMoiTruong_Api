@@ -21,6 +21,11 @@ namespace WebAPICore.Controllers
         {
             return CauHinhHeThongRepository.getMenuAdmin(user_id, role_id);
         }
+        [HttpPost("api/cau-hinh/update-danh-sach-menu")]
+        public JToken updateDsMenu(CauHinhModal obj)
+        {
+            return CauHinhHeThongRepository.updateDanhSachMenuHeThong(obj);
+        }
 
 
 
