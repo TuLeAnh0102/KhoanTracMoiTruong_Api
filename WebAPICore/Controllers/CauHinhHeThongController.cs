@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using WebAPICore.Repository;
 using Microsoft.AspNetCore.Authorization;
 using WebAPICore.Model.CauHinh;
+//using System.Dynamic;
 
 namespace WebAPICore.Controllers
 {
@@ -10,7 +11,7 @@ namespace WebAPICore.Controllers
     [ApiController]
     public class CauHinhHeThongController : ControllerBase
     {
-
+        //dynamic objtest = new ExpandoObject();
         [HttpGet("api/cau-hinh/get-menu-by-user")]
         public JToken getMenu(int user_id, int role_id)
         {
@@ -26,7 +27,12 @@ namespace WebAPICore.Controllers
         {
             return CauHinhHeThongRepository.updateDanhSachMenuHeThong(obj);
         }
-
+        [AllowAnonymous]
+        [HttpPost("api/cau-hinh/test-bot")]
+        public JToken updateDsMenu(object set_variables)
+        {
+            return CauHinhHeThongRepository.testbot(set_variables);
+        }
 
 
         [HttpGet("api/cau-hinh/get-loai-tai-khoan")]

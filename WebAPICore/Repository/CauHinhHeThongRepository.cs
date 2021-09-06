@@ -6,6 +6,7 @@ using System.Text;
 using System.Data;
 using WebAPICore.Model;
 using WebAPICore.Model.CauHinh;
+using System.Dynamic;
 
 namespace WebAPICore.Repository
 {
@@ -46,12 +47,29 @@ namespace WebAPICore.Repository
                 param.Add("p_stt", obj.stt);
                 param.Add("p_id_cha", obj.id_cha);
                 param.Add("p_is_delete", obj.is_delete);
-                var response = baseSQL.GetList("CAUHINH_Update_Danh_Sach_Menu", param);
+                var response = baseSQL.Execute("CAUHINH_Update_Danh_Sach_Menu", param);
                 return JsonHelper.ToJson(response);
             }
         }
 
+        public static JToken testbot(object obj)
+        {
+            using (var baseSQL = new BaseSQL())
+            {
+                var param = new SQLDynamicParameters();
+                dynamic objtest = new ExpandoObject();
+                dynamic rs = new ExpandoObject();
+                rs.hten = "123";
+                objtest.status = "success";
+                objtest.code= 200;
+                objtest.set_variables = rs;
+                return JsonHelper.ToJson(objtest);
+            }
+        }
 
+
+
+        //var response = baseSQL.GetList("CAUHINH_GET_LOAI_TAI_KHOAN", param);
         public static JToken getLoaiTaiKhoan()
         {
             using (var baseSQL = new BaseSQL())
