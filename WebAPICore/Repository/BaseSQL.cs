@@ -178,6 +178,50 @@ namespace WebAPICore.Repository
             }
         }
 
+        public ResponseListClass<T> GetListClass<T>(string store, SQLDynamicParameters param)
+        {
+            var log = new LOG();
+            log.db_connect = GetNow();
+            log.store = store;
+            using (var db = new SqlConnection(strConnect))
+            {
+
+                var Response = new ResponseListClass<T>();
+                Response.store_name = store;
+                Response.store_type = 2;
+                try
+                {
+                    var data = db.Query<T>(store, param, commandType: CommandType.StoredProcedure);
+
+                    Response.data = data;
+                    if (data.Count() == 0)
+                    {
+                        Response.message = "Không tìm thấy dữ liệu";
+                    }
+                    else
+                    {
+                        Response.message = "Lấy dữ liệu thành công";
+                    }
+
+                    Response.success = true;
+                }
+                catch (Exception ex)
+                {
+                    Response.data = default(List<T>);
+                    Response.message = ex.Message;
+                    Response.success = false;
+                }
+                finally
+                {
+                    Response.param = param;
+                    db.Close();
+                }
+                log.db_response = GetNow();
+                WriteLog(log);
+                return Response;
+            }
+        }
+
         public ResponsePageList GetPageList(string store, object obj)
         {
             var log = new LOG();

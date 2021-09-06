@@ -11,7 +11,7 @@ namespace WebAPICore.Repository
 {
     public class ChiSoKhongKhiRepository
     {
-        public static JToken Create_ChiSoTramQuanTrac(Chi_So_TramQT_Create_IN obj)
+        public static JToken Create_ChiSoTramQuanTrac(ChiSoTramQuanTracModel obj)
         {
             ResponseExecute response = new ResponseExecute();
             //insert user
@@ -65,6 +65,20 @@ namespace WebAPICore.Repository
                 var response = baseSQL.GetSingle("GetMaxTimeByTramQuanTrac", param);
                 return response;
             }
+        }
+    
+        public static ResponseList GetChiSoTramQuanTracByTime(string ma_tram_quan_trac, string time_start, string time_end)
+        {
+            using (var baseSQL = new BaseSQL())
+            {
+                var param = new SQLDynamicParameters();
+                param.Add("@p_ma_tram_quan_trac", ma_tram_quan_trac);
+                param.Add("@p_time_start", time_start);
+                param.Add("@p_time_end", time_end);
+                var response = baseSQL.GetList("GET_CHI_SO_TRAM_QUAN_TRAC", param);
+                return response;
+            }
+            
         }
     }
 }

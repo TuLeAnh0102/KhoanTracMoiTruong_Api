@@ -14,4 +14,14 @@ namespace WebAPICore.Model.Response
         public IEnumerable<dynamic> data { get; set; }
         public SQLDynamicParameters param { get; set; }
     }
+
+    public class ResponseListClass<T>
+    {
+        public bool success { get; set; }
+        public string message { get; set; }
+        public string store_name { get; set; }
+        public int store_type { get; set; }
+        public IEnumerable<T> data { get; set; }
+        public SQLDynamicParameters param { get; set; }
+    }
 }

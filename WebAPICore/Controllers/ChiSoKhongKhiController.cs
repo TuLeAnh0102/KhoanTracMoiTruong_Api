@@ -43,12 +43,22 @@ namespace WebAPICore.Controllers
                     if (!string.IsNullOrWhiteSpace(repo.data.max_time))
                     {
                         time_max = repo.data.max_time;
-                        thongSoAqi.TimeLoad = ConvertTimeToFormat(repo.data.max_time);
+                        //thongSoAqi.TimeLoad = ConvertTimeToFormat(repo.data.max_time);
                     }
                 }
                 //read file local and insert in database from time max
-                //Create_Chi_So_Quan_Trac(ma_loai_quan_trac, ma_tram_quan_trac, time_max);
+                Create_Chi_So_Quan_Trac(ma_loai_quan_trac, ma_tram_quan_trac, time_max);
 
+                //DateTime time_start = DateTime.ParseExact(time_max, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                //DateTime time_end = DateTime.Now;
+                //ResponseList resChiSo = ChiSoKhongKhiRepository.GetChiSoTramQuanTracByTime(ma_tram_quan_trac,
+                //                            String.Concat(time_start.ToString("yyyyMMddHH"), "0000"), 
+                //                            String.Concat(time_end.ToString("yyyyMMddHH"), "5959"));
+                //if(resChiSo.success)
+                //{
+                //    List <ChiSoTramQuanTracModel> lstChiSoTramQT = JsonHelper.ToClass<List<ChiSoTramQuanTracModel>>(JsonHelper.ToJson(resChiSo.data).ToString());
+                //    var b = 1;
+                //}
 
                 thongSoAqi.VN_AQI_H = 70;
                 thongSoAqi.ThongBaoDan = ThongBaoNguoiDanByAQI(ma_loai_quan_trac, thongSoAqi.VN_AQI_H);
@@ -83,17 +93,44 @@ namespace WebAPICore.Controllers
 
         private bool Create_Chi_So_Quan_Trac(string ma_quan_trac, string ma_tram_quan_trac, string time_max)
         {
-            List<Chi_So_TramQT_Create_IN> lstChiSoIn = ReloadData(ma_quan_trac, ma_tram_quan_trac, time_max);
-            foreach (var chi_so_tramQT_in in lstChiSoIn)
+            List<ChiSoTramQuanTracModel> lstChiSoTramQT = ReloadData(ma_quan_trac, ma_tram_quan_trac, time_max);
+            Dictionary<string, List<NongDoQuanTracKhongKhiModel>> dicNDQTTheoGio = new Dictionary<string, List<NongDoQuanTracKhongKhiModel>>();
+            foreach (var iChiSoTramQT in lstChiSoTramQT)
             {
-                ChiSoKhongKhiRepository.Create_ChiSoTramQuanTrac(chi_so_tramQT_in);
+                string time_hour = iChiSoTramQT.thoi_gian.Substring(0, 10);
+                NongDoQuanTracKhongKhiModel item = new NongDoQuanTracKhongKhiModel();
+
+                string[] lineChiSoTramQT = iChiSoTramQT.chi_so_do_dac.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+                foreach (var iLineChiSoTramQT in lineChiSoTramQT)
+                {
+                    string[] lineData = iLineChiSoTramQT.Split('	');
+                    
+                    FileChiSoQuanTracModel model = new FileChiSoQuanTracModel();
+                    model.TenChiSo = lineData[0];
+                    model.ChiSo = float.Parse(lineData[1], CultureInfo.InvariantCulture.NumberFormat);
+                    model.DonVi = lineData[2];
+                    model.ThoiGian = lineData[3];
+                    model.NoName = lineData[4];
+                }
+                
+                if (dicNDQTTheoGio.ContainsKey(time_hour)){
+                    dicNDQTTheoGio[time_hour].Add(item);
+                }
+                else
+                {
+                    List<NongDoQuanTracKhongKhiModel> lst = new List<NongDoQuanTracKhongKhiModel>();
+                    lst.Add(item);
+                    dicNDQTTheoGio.Add(time_hour, lst);
+                }
+                //ChiSoKhongKhiRepository.Create_ChiSoTramQuanTrac(chi_so_tramQT_in);
             }
             return false;
         }
 
-        private List<Chi_So_TramQT_Create_IN> ReloadData(string ma_quan_trac, string ma_tram_quan_trac, string time_max)
+        private List<ChiSoTramQuanTracModel> ReloadData(string ma_quan_trac, string ma_tram_quan_trac, string time_max)
         {
-            List<Chi_So_TramQT_Create_IN> lstChiSoIn = new List<Chi_So_TramQT_Create_IN>();
+            List<ChiSoTramQuanTracModel> lstChiSoIn = new List<ChiSoTramQuanTracModel>();
               
 
             String strAPI = Startup.ConnectApiLoadData + "api/file/read-tram-quan-trac?ma_loai_quan_trac=KHONG_KHI&ma_tram_quan_trac=DXI_SoTNMT&max_time=" + time_max;
@@ -122,7 +159,7 @@ namespace WebAPICore.Controllers
             lstTramQT = JsonHelper.ToClass<List<TimeTramQuanTracModel>>(strResponse);
             foreach (TimeTramQuanTracModel timeTramQT in lstTramQT)
             {
-                Chi_So_TramQT_Create_IN cs = new Chi_So_TramQT_Create_IN();
+                ChiSoTramQuanTracModel cs = new ChiSoTramQuanTracModel();
                 cs.file_name = timeTramQT.TenFile;
                 cs.chi_so_do_dac = timeTramQT.ChiSoDoDac;
                 cs.thoi_gian = timeTramQT.ThoiGian;
@@ -139,6 +176,24 @@ namespace WebAPICore.Controllers
                 return string.Empty;
             DateTime datetime = DateTime.ParseExact(time, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
             return datetime.ToString("HH:ss dd/MM/yyyy");
+        }
+    
+
+        private float CalculateAQI(string ma_tram_quan_trac)
+        {
+            float AQI = 70;
+            //DateTime curDateTime = DateTime.Now.AddHours(-1);
+           
+
+
+            return AQI;
+        }
+
+        private float MathNowCast()
+        {
+            float nowCast = 0;
+
+            return nowCast;
         }
     }
 }
